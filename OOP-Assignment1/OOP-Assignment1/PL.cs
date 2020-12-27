@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OOP_Assignment1
 {
-    class Program
+    class PL
     {
         static void Main(string[] args)
         {
@@ -18,7 +18,17 @@ namespace OOP_Assignment1
             while (userchoice != 2)
             {
                 menuMaker("Main Menu","=========",menuOptions);
-                userchoice = Convert.ToInt32(Console.ReadLine());
+                try
+                {
+                    userchoice = Convert.ToInt32(Console.ReadLine());
+                }
+                catch
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please Input a number, not a letter or special character.");
+                    Console.WriteLine("\nPress any key to continue..");
+                    Console.ReadKey();
+                }
 
                 if (userchoice == 1)
                 {
