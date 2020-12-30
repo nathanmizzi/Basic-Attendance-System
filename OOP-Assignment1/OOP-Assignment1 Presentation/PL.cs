@@ -19,7 +19,7 @@ namespace OOP_Assignment1_Presentation
 
             while (userchoice != 2)
             {
-                menuMaker("Main Menu",true, menuOptions);
+                menuMaker("Main Menu", menuOptions);
                 try
                 {
                     Console.Write("Enter Choice: ");
@@ -27,10 +27,7 @@ namespace OOP_Assignment1_Presentation
                 }
                 catch
                 {
-                    Console.Clear();
-                    Console.WriteLine("Please Input a number, not a letter or special character.");
-                    Console.WriteLine("\nPress any key to continue..");
-                    Console.ReadKey();
+                    displayError();
                 }
 
                 if (userchoice == 1)
@@ -48,11 +45,9 @@ namespace OOP_Assignment1_Presentation
                         if (bl.login(username, password))
                         {
                             //Show teachers Menu
-
-
                             while (true)
                             {
-                                menuMaker("Teachers Menu", true, new List<string>
+                                menuMaker("Teachers Menu", new List<string>
                                 {"Add Attendance","Add a New Group"
                                 ,"Add a New Student","Add a New Teacher"
                                 ,"Check a student's attendance percentage"
@@ -68,19 +63,23 @@ namespace OOP_Assignment1_Presentation
                                 }
                                 catch
                                 {
-                                    Console.Clear();
-                                    Console.WriteLine("Please Input a number, not a letter or special character.");
-                                    Console.WriteLine("\nPress any key to continue..");
-                                    Console.ReadKey();
+                                    displayError();
                                 }
 
                                 switch (optionChosen)
                                 {
                                     case 1:
 
-                                        Console.Clear();
+                                    Console.Clear();
 
-                                        menuMaker("Groups",false,new List<string>{});
+                                    int selectedGroupID = 0;
+
+                                    while (selectedGroupID == 0)
+                                    {
+
+                                        menuMaker("Groups", new List<string> { });
+
+                                        Console.WriteLine("Group ID         Group Name");
 
                                         List<string> groups = bl.allGroups();
 
@@ -89,8 +88,57 @@ namespace OOP_Assignment1_Presentation
                                             Console.WriteLine(group);
                                         }
 
-                                        Console.Write("\nPlease input your Group ID: ");
-                                        Console.ReadLine();
+                                        Console.Write("\nPlease input your selected Group ID: ");
+                                        try
+                                        {
+                                            selectedGroupID = Convert.ToInt32(Console.ReadLine());
+                                        }
+                                        catch
+                                        {
+                                            displayError();
+                                        }
+
+                                        Console.WriteLine(bl.addLesson(selectedGroupID, DateTime.Now));
+
+                                        Console.WriteLine("\nPress Any Key To Continue");
+                                        Console.ReadKey();
+
+                                        Console.Clear();
+
+                                        List<string> studentsInClass = bl.allStudentsInGroup(selectedGroupID);
+
+                                        menuMaker("New Attendance",new List<string>());
+                                        Console.WriteLine("\nGroup ID: " + selectedGroupID);
+                                        Console.WriteLine("Student ID\t\tStudent Name\t\tStudent Surname\t\tPresence(P/A)");
+                                        Console.WriteLine("==========\t\t============\t\t===============\t\t=============");
+                                        foreach (var student in studentsInClass)
+                                        {
+                                            Console.WriteLine(student);
+                                        }
+
+                                        int startingCursorPosition = 6;
+
+                                        for (int i = 0; i < studentsInClass.Count; i++)
+                                        {
+                                            Console.SetCursorPosition(72, startingCursorPosition);
+                                            string status = Console.ReadLine();
+
+                                            if(status == "p" || status == "a")
+                                            {
+                                                startingCursorPosition++;
+                                            }
+                                            else
+                                            {
+                                                Console.SetCursorPosition(0,startingCursorPosition + studentsInClass.Count);
+                                                Console.WriteLine("Please only input A or P");
+                                                Console.ReadKey();
+                                                Console.SetCursorPosition(72,startingCursorPosition);
+                                                Console.Write("\r");
+                                                i--;
+                                            }
+
+                                        }
+                                    }
 
                                         break;
                                     case 2:
@@ -124,7 +172,7 @@ namespace OOP_Assignment1_Presentation
             }
         }
 
-        public static void menuMaker(string menuName,bool numbering, List<string> menuOptions)
+        public static void menuMaker(string menuName, List<string> menuOptions)
         {
             int cnt = 0;
             Console.Clear();
@@ -145,6 +193,14 @@ namespace OOP_Assignment1_Presentation
                 cnt++;
                 Console.WriteLine(cnt + ". " + menuOption);
             }
+        }
+
+        public static void displayError()
+        {
+            Console.Clear();
+            Console.WriteLine("Please Input a number, not a letter or special character.");
+            Console.WriteLine("\nPress any key to continue..");
+            Console.ReadKey();
         }
     }
 }

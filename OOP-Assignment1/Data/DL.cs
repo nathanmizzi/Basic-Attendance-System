@@ -53,5 +53,45 @@ namespace Data
 
             return groups;
         }
+
+        public bool createLesson(int groupID, DateTime dateTime, int teacherID)
+        {
+            try
+            {
+                Lesson L = new Lesson();
+
+                L.GroupID = groupID;
+                L.DateTime = dateTime;
+                L.TeacherID = teacherID;
+
+                db.Lesson.Add(L);
+                db.SaveChanges();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public List<string> studentsInGroup(int groupID)
+        {
+            List<string> studentsInGroup = new List<string>();
+
+            var records = db.Student;
+
+            var recordsQuery =
+                from record in records
+                where record.GroupID == groupID
+                select record;
+
+            foreach (var record in recordsQuery)
+            {
+                studentsInGroup.Add( record.StudentID + "\t\t\t" + record.Name + "\t\t\t" + record.Surname + "\t\t\t");
+            }
+
+            return studentsInGroup;
+        }
     }
 }

@@ -45,11 +45,32 @@ namespace Business
 
             foreach (var group in groups)
             {
-                formattedGroups.Add("Group ID: " + group.GroupID + " Group Name: " + group.Name);
+                formattedGroups.Add("\n    " + group.GroupID + "                 " + group.Name);
             }
 
             return formattedGroups;
         }
 
+        public string addLesson(int groupID, DateTime dateTime)
+        {
+            bool lessonAdded = dl.createLesson(groupID, dateTime, loggedInID);
+
+            if (lessonAdded)
+            {
+                return "Lesson Created Successfully...";
+            }
+
+            return "Error in Lesson Creation...";
+        }
+
+        public List<string> allStudentsInGroup(int groupID)
+        {
+            if (dl.studentsInGroup(groupID).Count > 0)
+            {
+                return dl.studentsInGroup(groupID);
+            }
+
+            return new List<string>();
+        }
     }
 }
