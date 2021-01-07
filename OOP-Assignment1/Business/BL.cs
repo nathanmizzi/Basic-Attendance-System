@@ -11,10 +11,11 @@ namespace Business
     public class BL
     {
         public int loggedInID;
+        public int lastLessonID;
         static DL dl = new DL();
         public bool ValidateMatches(string username)
         {
-            Teacher matchesFound = dl.checkUsername(username);
+            Teacher matchesFound = dl.CheckUsername(username);
 
             if (matchesFound != null)
             {
@@ -24,9 +25,9 @@ namespace Business
             return false;
         }
 
-        public bool login(string username, string password)
+        public bool Login(string username, string password)
         {
-            Teacher accountFound = dl.logIn(username,password);
+            Teacher accountFound = dl.LogIn(username,password);
 
             if (accountFound != null)
             {
@@ -37,7 +38,7 @@ namespace Business
             return false;
         }
 
-        public List<string> allGroups()
+        public List<string> AllGroups()
         {
             List<Group> groups = dl.DisplayGroups();
 
@@ -51,26 +52,87 @@ namespace Business
             return formattedGroups;
         }
 
-        public string addLesson(int groupID, DateTime dateTime)
+        public string AddLesson(int groupID, DateTime dateTime)
         {
-            bool lessonAdded = dl.createLesson(groupID, dateTime, loggedInID);
+            int lessonAdded = dl.CreateLesson(groupID, dateTime, loggedInID);
 
-            if (lessonAdded)
+            if (lessonAdded != -1)
             {
+                lastLessonID = lessonAdded;
                 return "Lesson Created Successfully...";
             }
 
             return "Error in Lesson Creation...";
         }
 
-        public List<string> allStudentsInGroup(int groupID)
+        public List<string> AllStudentsInGroup(int groupID)
         {
-            if (dl.studentsInGroup(groupID).Count > 0)
+            if (dl.StudentsInGroup(groupID).Count > 0)
             {
-                return dl.studentsInGroup(groupID);
+                return dl.StudentsInGroup(groupID);
             }
 
             return new List<string>();
+        }
+
+        public void AddAttendance(List<string> attendanceInfo)
+        {
+            dl.SubmitAttendance(attendanceInfo,lastLessonID);
+        }
+
+        public void AddGroup(string groupName,string courseName)
+        {
+            dl.NewGroup(groupName,courseName);
+        }
+
+        public bool AddStudent(int groupID,string name,string surname, string email)
+        {
+            bool groupFound = dl.NewStudent(groupID,name,surname,email);
+
+            return groupFound;
+        }
+
+        public bool AddTeacher(string username,string password,string name,string surname,string email)
+        {
+            if (!String.IsNullOrEmpty(username) || !String.IsNullOrEmpty(password) || !String.IsNullOrEmpty(name) ||
+                !String.IsNullOrEmpty(surname) || !String.IsNullOrEmpty(email))
+            {
+                dl.NewTeacher(username,password,name,surname,email);
+            }
+
+            return false;
+        }
+
+        public bool VerifyStudentID(int proposedID)
+        {
+            if (proposedID != null)
+            {
+                if (dl.VerifyStudent(proposedID) != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public List<string> ReturnAttendencePercentage(int studentID)
+        {
+            List<StudentAttendance> matchingAttendences = dl.GetAttendances(studentID);
+
+            List<string> matches = new List<string>();
+
+            foreach (var matchingAttendence in matchingAttendences)
+            {
+                matches.Add(matchingAttendence.Student.Name + " " + matchingAttendence.Student.Surname + " " 
+                            + matchingAttendence.Lesson.DateTime + " " + matchingAttendence.Presence);
+                
+            }
+
+            //To add attendance percentage formula
+            //matches.Add("\n" + );
+
+            return;
         }
     }
 }

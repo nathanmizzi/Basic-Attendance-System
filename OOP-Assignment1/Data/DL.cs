@@ -12,7 +12,7 @@ namespace Data
     {
         MasterEntities db = new MasterEntities();
 
-        public Teacher checkUsername(string username)
+        public Teacher CheckUsername(string username)
         {
             var records = db.Teacher;
 
@@ -24,7 +24,7 @@ namespace Data
             return recordsQuery.SingleOrDefault();
         }
 
-        public Teacher logIn(string username, string password)
+        public Teacher LogIn(string username, string password)
         {
             var records = db.Teacher;
 
@@ -54,28 +54,29 @@ namespace Data
             return groups;
         }
 
-        public bool createLesson(int groupID, DateTime dateTime, int teacherID)
+        public int CreateLesson(int groupID, DateTime dateTime, int teacherID)
         {
             try
             {
-                Lesson L = new Lesson();
-
-                L.GroupID = groupID;
-                L.DateTime = dateTime;
-                L.TeacherID = teacherID;
+                Lesson L = new Lesson
+                {
+                    GroupID = groupID,
+                    DateTime = dateTime,
+                    TeacherID = teacherID
+                };
 
                 db.Lesson.Add(L);
                 db.SaveChanges();
+
+                return L.LessonID;
             }
             catch
             {
-                return false;
+                return -1;
             }
-
-            return true;
         }
 
-        public List<string> studentsInGroup(int groupID)
+        public List<string> StudentsInGroup(int groupID)
         {
             List<string> studentsInGroup = new List<string>();
 
@@ -92,6 +93,137 @@ namespace Data
             }
 
             return studentsInGroup;
+        }
+
+        public void SubmitAttendance(List<string> students, int currentLessonID)
+        {
+            foreach (var student in students)
+            {
+                int studentIDEnd = student.IndexOf("\t");
+                bool prescence = false;
+
+                try
+                {
+                    int studentID = Convert.ToInt32(student.Substring(0, studentIDEnd));
+                    char prescenceChar = student.Last();
+
+                    if (prescenceChar == 'p')
+                    {
+                        prescence = true;
+                    }
+
+                    StudentAttendance SA = new StudentAttendance
+                    {
+                        LessonID = currentLessonID,
+                        Presence = prescence,
+                        StudentID = studentID
+                    };
+
+                    db.StudentAttendance.Add(SA);
+                    db.SaveChanges();
+                }
+                catch
+                {
+                    Console.Clear();
+                    Console.WriteLine("Fatal Error");
+                    Console.ReadKey();
+                }
+            }
+        }
+
+        public void NewGroup(string groupName, string courseName)
+        {
+            Group g = new Group
+            {
+                Name = groupName,
+                Course = courseName
+            };
+
+            db.Group.Add(g);
+            db.SaveChanges();
+        }
+
+        public bool NewStudent(int groupID, string name, string surname, string email)
+        {
+            var records = db.Group;
+
+            var recordsQuery =
+                from record in records
+                where record.GroupID == groupID
+                select record;
+
+            if (recordsQuery.Count() > 0)
+            {
+                Student s = new Student
+                {
+                    Name = name,
+                    Surname = surname,
+                    Email = email,
+                    GroupID = groupID
+                };
+
+                db.Student.Add(s);
+                db.SaveChanges();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool NewTeacher(string username, string password, string name, string surname, string email)
+        {
+            try
+            {
+                Teacher t = new Teacher
+                {
+                    Username = username,
+                    Password = password,
+                    Name = name,
+                    Surname = surname,
+                    Email = email
+                };
+
+                db.Teacher.Add(t);
+                db.SaveChanges();
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public Student VerifyStudent(int proposedID)
+        {
+            var records = db.Student;
+
+            var recordsQuery =
+                from record in records
+                where record.StudentID == proposedID
+                select record;
+
+            return recordsQuery.SingleOrDefault();
+        }
+
+        public List<StudentAttendance> GetAttendances(int studentID)
+        {
+            var records = db.StudentAttendance;
+
+            var recordsQuery =
+                from record in records
+                where record.StudentID == studentID && record.Presence == true
+                select record;
+
+            List<StudentAttendance> attendedClasses = new List<StudentAttendance>();
+
+            foreach (var studentAttendance in recordsQuery)
+            {
+                attendedClasses.Add(studentAttendance);
+            }
+
+            return attendedClasses;
         }
     }
 }

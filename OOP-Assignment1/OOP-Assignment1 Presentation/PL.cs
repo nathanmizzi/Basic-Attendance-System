@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,7 @@ namespace OOP_Assignment1_Presentation
                     {
                         Console.Write("Password: ");
                         string password = Console.ReadLine();
-                        if (bl.login(username, password))
+                        if (bl.Login(username, password))
                         {
                             //Show teachers Menu
                             while (true)
@@ -81,7 +82,7 @@ namespace OOP_Assignment1_Presentation
 
                                         Console.WriteLine("Group ID         Group Name");
 
-                                        List<string> groups = bl.allGroups();
+                                        List<string> groups = bl.AllGroups();
 
                                         foreach (var group in groups)
                                         {
@@ -98,14 +99,14 @@ namespace OOP_Assignment1_Presentation
                                             displayError();
                                         }
 
-                                        Console.WriteLine(bl.addLesson(selectedGroupID, DateTime.Now));
+                                        Console.WriteLine(bl.AddLesson(selectedGroupID, DateTime.Now));
 
                                         Console.WriteLine("\nPress Any Key To Continue");
                                         Console.ReadKey();
 
                                         Console.Clear();
 
-                                        List<string> studentsInClass = bl.allStudentsInGroup(selectedGroupID);
+                                        List<string> studentsInClass = bl.AllStudentsInGroup(selectedGroupID);
 
                                         menuMaker("New Attendance",new List<string>());
                                         Console.WriteLine("\nGroup ID: " + selectedGroupID);
@@ -121,33 +122,123 @@ namespace OOP_Assignment1_Presentation
                                         for (int i = 0; i < studentsInClass.Count; i++)
                                         {
                                             Console.SetCursorPosition(72, startingCursorPosition);
-                                            string status = Console.ReadLine();
+                                            char status = Console.ReadKey().KeyChar;
 
-                                            if(status == "p" || status == "a")
+                                            switch (status)
                                             {
-                                                startingCursorPosition++;
+                                                    case 'p':
+                                                        startingCursorPosition++;
+                                                        studentsInClass[i] = studentsInClass[i] + "p";
+                                                        break;
+                                                    case 'a':
+                                                        startingCursorPosition++;
+                                                        studentsInClass[i] = studentsInClass[i] + "a";
+                                                        break;
+                                                    default:
+                                                        Console.Write("\b \b");
+                                                        i--;
+                                                        break;
+                                            }
+                                        }
+
+                                        bl.AddAttendance(studentsInClass);
+                                    }
+
+                                    break;
+
+                                    case 2:
+                                        //To be tested
+                                        Console.Clear();
+
+                                        Console.Write("Please input group name: ");
+                                        string chosenGroupName = Console.ReadLine();
+
+                                        Console.Write("Please input course name: ");
+                                        string chosenCourseName = Console.ReadLine();
+
+                                        bl.AddGroup(chosenGroupName,chosenCourseName);
+
+                                        break;
+                                    case 3:
+                                        //To be tested
+                                        Console.Clear();
+
+                                        Console.Write("Please input group ID: ");
+                                        int chosenGroupID = Convert.ToInt32(Console.ReadLine());
+
+                                        Console.Write("Please input student name: ");
+                                        string studentName = Console.ReadLine();
+
+                                        Console.Write("Please input student surname: ");
+                                        string studentSurname = Console.ReadLine();
+
+                                        Console.Write("Please input student email: ");
+                                        string studentEmail = Console.ReadLine();
+
+                                        if (bl.AddStudent(chosenGroupID,studentName,studentSurname,studentEmail))
+                                        { 
+                                            Console.WriteLine("Successfully added student");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Failed to add student");
+                                        }
+
+                                        break;
+                                    case 4:
+                                        //To be tested
+                                        Console.Clear();
+                                        
+                                        Console.Write("\n Please input new teacher username: ");
+                                        string teacherUsername = Console.ReadLine();
+
+                                        Console.Write("\nPlease input new teacher password: ");
+                                        string teacherPassword = Console.ReadLine();
+
+                                        Console.Write("\nPlease input new teacher Name: ");
+                                        string teacherName = Console.ReadLine();
+
+                                        Console.Write("\nPlease input new teacher Surname: ");
+                                        string teacherSurname = Console.ReadLine();
+
+                                        Console.Write("\nPlease input new teacher Email: ");
+                                        string teacherEmail = Console.ReadLine();
+
+                                        if (bl.AddTeacher(teacherUsername, teacherPassword, teacherName, teacherSurname,
+                                            teacherEmail))
+                                        {
+                                            Console.WriteLine("\nTask Performed Successfully");
+                                            Console.ReadKey();
+                                        }
+                                        else
+                                        {
+                                            displayError();
+                                        }
+
+                                        break;
+                                    case 5:
+                                        //To be Tested
+                                        Console.Clear();
+
+                                        Console.Write("Please input student ID: ");
+
+                                        try
+                                        {
+                                            int proposedStudentID = Convert.ToInt32(Console.ReadLine());
+                                            if (bl.VerifyStudentID(proposedStudentID))
+                                            {
+                                                
                                             }
                                             else
                                             {
-                                                Console.SetCursorPosition(0,startingCursorPosition + studentsInClass.Count);
-                                                Console.WriteLine("Please only input A or P");
-                                                Console.ReadKey();
-                                                Console.SetCursorPosition(72,startingCursorPosition);
-                                                Console.Write("\r");
-                                                i--;
+                                                Console.WriteLine("\nNo Student with that ID found.");
                                             }
-
                                         }
-                                    }
+                                        catch
+                                        {
+                                            displayError();
+                                        }
 
-                                        break;
-                                    case 2:
-                                        break;
-                                    case 3:
-                                        break;
-                                    case 4:
-                                        break;
-                                    case 5:
                                         break;
                                     case 6:
                                         break;
@@ -198,7 +289,7 @@ namespace OOP_Assignment1_Presentation
         public static void displayError()
         {
             Console.Clear();
-            Console.WriteLine("Please Input a number, not a letter or special character.");
+            Console.WriteLine("Please Input a number, not a letter or special character and make sure all requested inputs are filled.");
             Console.WriteLine("\nPress any key to continue..");
             Console.ReadKey();
         }
