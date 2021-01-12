@@ -12,6 +12,7 @@ namespace Business
     {
         public int loggedInID;
         public int lastLessonID;
+        public int studentGroup;
         static DL dl = new DL();
         public bool ValidateMatches(string username)
         {
@@ -107,8 +108,12 @@ namespace Business
         {
             if (proposedID != null)
             {
-                if (dl.VerifyStudent(proposedID) != null)
+
+                Student s = dl.VerifyStudent(proposedID);
+
+                if (s != null)
                 {
+                    studentGroup = s.GroupID;
                     return true;
                 }
             }
@@ -116,23 +121,16 @@ namespace Business
             return false;
         }
 
-        public List<string> ReturnAttendencePercentage(int studentID)
+        public double ReturnAttendencePercentage(int studentID)
         {
-            List<StudentAttendance> matchingAttendences = dl.GetAttendances(studentID);
+            double allAttendances = dl.GetAttendances(studentGroup,studentID);
 
-            List<string> matches = new List<string>();
+            double matchingAttendences = dl.GetSpecificAttendances(studentID);
 
-            foreach (var matchingAttendence in matchingAttendences)
-            {
-                matches.Add(matchingAttendence.Student.Name + " " + matchingAttendence.Student.Surname + " " 
-                            + matchingAttendence.Lesson.DateTime + " " + matchingAttendence.Presence);
-                
-            }
-
-            //To add attendance percentage formula
-            //matches.Add("\n" + );
-
-            return;
+            double attendancePercentage = (matchingAttendences / allAttendances) * 100;
+            
+            return attendancePercentage;
         }
+
     }
 }

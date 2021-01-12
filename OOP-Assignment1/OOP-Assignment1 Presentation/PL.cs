@@ -217,7 +217,6 @@ namespace OOP_Assignment1_Presentation
 
                                         break;
                                     case 5:
-                                        //To be Tested
                                         Console.Clear();
 
                                         Console.Write("Please input student ID: ");
@@ -227,7 +226,14 @@ namespace OOP_Assignment1_Presentation
                                             int proposedStudentID = Convert.ToInt32(Console.ReadLine());
                                             if (bl.VerifyStudentID(proposedStudentID))
                                             {
-                                                
+                                                Console.Clear();
+
+                                                double Percentage = bl.ReturnAttendencePercentage(proposedStudentID);
+
+                                                Console.WriteLine("Your Attendance percentage is: " + Percentage + "%");
+
+                                                Console.WriteLine("\nPress any key to continue...");
+                                                Console.ReadKey();
                                             }
                                             else
                                             {

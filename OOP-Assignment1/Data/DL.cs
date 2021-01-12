@@ -207,7 +207,26 @@ namespace Data
             return recordsQuery.SingleOrDefault();
         }
 
-        public List<StudentAttendance> GetAttendances(int studentID)
+        public double GetAttendances(int groupID, int studentID)
+        {
+            var records = db.StudentAttendance;
+
+            var recordsQuery =
+                from record in records
+                where record.Lesson.GroupID == groupID && record.StudentID == studentID
+                select record;
+
+            List<StudentAttendance> allAttendences = new List<StudentAttendance>();
+
+            foreach (var studentAttendance in recordsQuery)
+            {
+                allAttendences.Add(studentAttendance);
+            }
+
+            return allAttendences.Count;
+        }
+
+        public double GetSpecificAttendances(int studentID)
         {
             var records = db.StudentAttendance;
 
@@ -216,14 +235,16 @@ namespace Data
                 where record.StudentID == studentID && record.Presence == true
                 select record;
 
-            List<StudentAttendance> attendedClasses = new List<StudentAttendance>();
+            List<StudentAttendance> specificAttendances = new List<StudentAttendance>();
 
             foreach (var studentAttendance in recordsQuery)
             {
-                attendedClasses.Add(studentAttendance);
+                specificAttendances.Add(studentAttendance);
             }
 
-            return attendedClasses;
+            return specificAttendances.Count;
         }
+
     }
-}
+ }
+
