@@ -81,9 +81,14 @@ namespace Business
             dl.SubmitAttendance(attendanceInfo,lastLessonID);
         }
 
-        public void AddGroup(string groupName,string courseName)
+        public bool AddGroup(string groupName,string courseName)
         {
-            dl.NewGroup(groupName,courseName);
+            if (!string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(courseName))
+            {
+                return dl.NewGroup(groupName, courseName);
+            }
+
+            return false;
         }
 
         public bool AddStudent(int groupID,string name,string surname, string email)
@@ -121,7 +126,7 @@ namespace Business
             return false;
         }
 
-        public double ReturnAttendencePercentage(int studentID)
+        public double ReturnAttendancePercentage(int studentID)
         {
             double allAttendances = dl.GetAttendances(studentGroup,studentID);
 
@@ -130,6 +135,28 @@ namespace Business
             double attendancePercentage = (matchingAttendences / allAttendances) * 100;
             
             return attendancePercentage;
+        }
+
+        public int ReturnAttendancesOnDay(int day, int month, int year)
+        {
+            if (day >= 1 && day <= 31 && month >= 1 && month <= 12)
+            {
+                int attendanceCount = dl.GetAttendancesOnDay(loggedInID,day, month, year);
+
+                return attendanceCount;
+            }
+
+            return 0;
+        }
+
+        public bool AttemptEditStudent(int studentID, string name, string surname, string email)
+        {
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(surname) && !string.IsNullOrEmpty(email))
+            {
+                return dl.EditStudent(studentID, name, surname, email);
+            }
+
+            return false;
         }
 
     }

@@ -20,16 +20,19 @@ namespace OOP_Assignment1_Presentation
 
             while (userchoice != 2)
             {
-                menuMaker("Main Menu", menuOptions);
-                try
+                do
                 {
+                    MenuMaker("Main Menu", menuOptions);
+
                     Console.Write("Enter Choice: ");
-                    userchoice = Convert.ToInt32(Console.ReadLine());
-                }
-                catch
-                {
-                    displayError();
-                }
+                    int.TryParse(Console.ReadLine(), out userchoice);
+
+                    if (userchoice == 0)
+                    {
+                        DisplayError();
+                    }
+
+                } while (userchoice == 0);
 
                 if (userchoice == 1)
                 {
@@ -48,24 +51,26 @@ namespace OOP_Assignment1_Presentation
                             //Show teachers Menu
                             while (true)
                             {
-                                menuMaker("Teachers Menu", new List<string>
-                                {"Add Attendance","Add a New Group"
-                                ,"Add a New Student","Add a New Teacher"
-                                ,"Check a student's attendance percentage"
-                                ,"Get all attendances submitted on a particular day"
-                                ,"Edit Student"});
-
                                 int optionChosen = 0;
 
-                                try
+                                do
                                 {
+                                    MenuMaker("Teachers Menu", new List<string>
+                                    {"Add Attendance","Add a New Group"
+                                        ,"Add a New Student","Add a New Teacher"
+                                        ,"Check a student's attendance percentage"
+                                        ,"Get all attendances submitted on a particular day"
+                                        ,"Edit Student"});
+
                                     Console.Write("\nEnter Choice: ");
-                                    optionChosen = Convert.ToInt32(Console.ReadLine());
-                                }
-                                catch
-                                {
-                                    displayError();
-                                }
+                                    int.TryParse(Console.ReadLine(), out optionChosen);
+
+                                    if (optionChosen == 0)
+                                    {
+                                        DisplayError();
+                                    }
+
+                                } while (optionChosen == 0);
 
                                 switch (optionChosen)
                                 {
@@ -78,7 +83,7 @@ namespace OOP_Assignment1_Presentation
                                     while (selectedGroupID == 0)
                                     {
 
-                                        menuMaker("Groups", new List<string> { });
+                                        MenuMaker("Groups", new List<string> { });
 
                                         Console.WriteLine("Group ID         Group Name");
 
@@ -96,7 +101,7 @@ namespace OOP_Assignment1_Presentation
                                         }
                                         catch
                                         {
-                                            displayError();
+                                            DisplayError();
                                         }
 
                                         Console.WriteLine(bl.AddLesson(selectedGroupID, DateTime.Now));
@@ -108,7 +113,7 @@ namespace OOP_Assignment1_Presentation
 
                                         List<string> studentsInClass = bl.AllStudentsInGroup(selectedGroupID);
 
-                                        menuMaker("New Attendance",new List<string>());
+                                        MenuMaker("New Attendance",new List<string>());
                                         Console.WriteLine("\nGroup ID: " + selectedGroupID);
                                         Console.WriteLine("Student ID\t\tStudent Name\t\tStudent Surname\t\tPresence(P/A)");
                                         Console.WriteLine("==========\t\t============\t\t===============\t\t=============");
@@ -147,7 +152,6 @@ namespace OOP_Assignment1_Presentation
                                     break;
 
                                     case 2:
-                                        //To be tested
                                         Console.Clear();
 
                                         Console.Write("Please input group name: ");
@@ -156,7 +160,18 @@ namespace OOP_Assignment1_Presentation
                                         Console.Write("Please input course name: ");
                                         string chosenCourseName = Console.ReadLine();
 
-                                        bl.AddGroup(chosenGroupName,chosenCourseName);
+                                        Console.Clear();
+
+                                        if (bl.AddGroup(chosenGroupName, chosenCourseName))
+                                        {
+                                            Console.WriteLine("Successfully added group");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Failed to add group");
+                                        }
+
+                                        Console.ReadKey();
 
                                         break;
                                     case 3:
@@ -212,7 +227,7 @@ namespace OOP_Assignment1_Presentation
                                         }
                                         else
                                         {
-                                            displayError();
+                                            DisplayError();
                                         }
 
                                         break;
@@ -228,7 +243,7 @@ namespace OOP_Assignment1_Presentation
                                             {
                                                 Console.Clear();
 
-                                                double Percentage = bl.ReturnAttendencePercentage(proposedStudentID);
+                                                double Percentage = bl.ReturnAttendancePercentage(proposedStudentID);
 
                                                 Console.WriteLine("Your Attendance percentage is: " + Percentage + "%");
 
@@ -242,13 +257,84 @@ namespace OOP_Assignment1_Presentation
                                         }
                                         catch
                                         {
-                                            displayError();
+                                            DisplayError();
                                         }
 
                                         break;
                                     case 6:
+
+                                        MenuMaker("Submitted Attendances",new List<string>());
+
+                                        Console.Write("\nDay: ");
+                                        Console.Write("\nMonth: ");
+                                        Console.Write("\nYear: ");
+
+                                        Console.SetCursorPosition(5,3);
+                                        int day = Convert.ToInt32(Console.ReadLine());
+                                        Console.SetCursorPosition(7, 4);
+                                        int month = Convert.ToInt32(Console.ReadLine());
+                                        Console.SetCursorPosition(6, 5);
+                                        int year = Convert.ToInt32(Console.ReadLine());
+
+                                        Console.WriteLine("\nNumber of attendances submitted on given day: " + bl.ReturnAttendancesOnDay(day,month,year));
+
+                                        Console.WriteLine("\nPress any key to continue...");
+                                        Console.ReadKey();
+
                                         break;
                                     case 7:
+
+                                        int studentID = 0;
+
+                                        do
+                                        {
+                                            MenuMaker("Edit Student",new List<string>());
+
+                                            Console.Write("\nStudent ID: ");
+
+                                            Console.SetCursorPosition(12, 3);
+
+                                            int.TryParse(Console.ReadLine(), out studentID);
+
+                                            if (studentID == 0)
+                                            {
+                                                DisplayError();
+                                            }
+                                            else
+                                            {
+                                                if (!bl.VerifyStudentID(studentID))
+                                                {
+                                                    studentID = 0;
+                                                    Console.WriteLine("Student not found, please check student id...");
+                                                    Console.ReadKey();
+                                                }
+                                            }
+
+                                        } while (studentID == 0);
+
+                                        Console.Write("\n Please input Name: ");
+                                        string name = Console.ReadLine();
+
+                                        Console.Write("\n Please input Surname: ");
+                                        string surname = Console.ReadLine();
+
+                                        Console.Write("\n Please input Email: ");
+                                        string email = Console.ReadLine();
+
+                                        Console.Clear();
+
+                                        if (bl.AttemptEditStudent(studentID, name, surname, email))
+                                        {
+                                            Console.WriteLine("Student successfully edited");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Failed to edit student");
+                                        }
+
+                                        Console.WriteLine("\nPress any key to continue...");
+                                        Console.ReadKey();
+                                        
                                         break;
                                 }
 
@@ -269,7 +355,7 @@ namespace OOP_Assignment1_Presentation
             }
         }
 
-        public static void menuMaker(string menuName, List<string> menuOptions)
+        public static void MenuMaker(string menuName, List<string> menuOptions)
         {
             int cnt = 0;
             Console.Clear();
@@ -292,7 +378,7 @@ namespace OOP_Assignment1_Presentation
             }
         }
 
-        public static void displayError()
+        public static void DisplayError()
         {
             Console.Clear();
             Console.WriteLine("Please Input a number, not a letter or special character and make sure all requested inputs are filled.");

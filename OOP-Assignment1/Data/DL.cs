@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -131,16 +132,26 @@ namespace Data
             }
         }
 
-        public void NewGroup(string groupName, string courseName)
+        public bool NewGroup(string groupName, string courseName)
         {
-            Group g = new Group
+            try
             {
-                Name = groupName,
-                Course = courseName
-            };
 
-            db.Group.Add(g);
-            db.SaveChanges();
+                Group g = new Group
+                {
+                    Name = groupName,
+                    Course = courseName
+                };
+
+                db.Group.Add(g);
+                db.SaveChanges();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool NewStudent(int groupID, string name, string surname, string email)
@@ -245,6 +256,55 @@ namespace Data
             return specificAttendances.Count;
         }
 
+        public int GetAttendancesOnDay(int teacherID,int day,int month,int year)
+        {
+            DateTime dateTime = new DateTime(year, month, day);
+
+            var records = db.Lesson;
+
+            var recordsQuery =
+                from record in records
+                where DbFunctions.TruncateTime(record.DateTime) == DbFunctions.TruncateTime(dateTime) && record.Teacher.TeacherID == teacherID
+                select record;
+
+            List<Lesson> lessonsOnDay = new List<Lesson>();
+
+            foreach (var lesson in recordsQuery)
+            {
+                lessonsOnDay.Add(lesson);
+            }
+
+            return lessonsOnDay.Count;
+        }
+
+        public bool EditStudent(int studentID,string name,string surname,string email)
+        {
+            try
+            {
+                var records = db.Student;
+
+                var student =
+                    from record in records
+                    where record.StudentID == studentID
+                    select record;
+
+                Student studentToEdit = student.SingleOrDefault();
+
+                studentToEdit.Name = name;
+                studentToEdit.Surname = surname;
+                studentToEdit.Email = email;
+
+                db.SaveChanges();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
+
  }
 
