@@ -11,7 +11,7 @@ namespace Data
 {
     public class DL
     {
-        MasterEntities db = new MasterEntities();
+        private MasterEntities db = new MasterEntities();
 
         public Teacher CheckUsername(string username)
         {
@@ -59,17 +59,17 @@ namespace Data
         {
             try
             {
-                Lesson L = new Lesson
+                Lesson l = new Lesson
                 {
                     GroupID = groupID,
                     DateTime = dateTime,
                     TeacherID = teacherID
                 };
 
-                db.Lesson.Add(L);
+                db.Lesson.Add(l);
                 db.SaveChanges();
 
-                return L.LessonID;
+                return l.LessonID;
             }
             catch
             {
@@ -101,26 +101,26 @@ namespace Data
             foreach (var student in students)
             {
                 int studentIDEnd = student.IndexOf("\t");
-                bool prescence = false;
+                bool presence = false;
 
                 try
                 {
                     int studentID = Convert.ToInt32(student.Substring(0, studentIDEnd));
-                    char prescenceChar = student.Last();
+                    char presenceChar = student.Last();
 
-                    if (prescenceChar == 'p')
+                    if (presenceChar == 'p')
                     {
-                        prescence = true;
+                        presence = true;
                     }
 
-                    StudentAttendance SA = new StudentAttendance
+                    StudentAttendance sa = new StudentAttendance
                     {
                         LessonID = currentLessonID,
-                        Presence = prescence,
+                        Presence = presence,
                         StudentID = studentID
                     };
 
-                    db.StudentAttendance.Add(SA);
+                    db.StudentAttendance.Add(sa);
                     db.SaveChanges();
                 }
                 catch
@@ -156,28 +156,32 @@ namespace Data
 
         public bool NewStudent(int groupID, string name, string surname, string email)
         {
-            var records = db.Group;
-
-            var recordsQuery =
-                from record in records
-                where record.GroupID == groupID
-                select record;
-
-            if (recordsQuery.Count() > 0)
+            try
             {
-                Student s = new Student
+                var records = db.Group;
+
+                var recordsQuery =
+                    from record in records
+                    where record.GroupID == groupID
+                    select record;
+
+                if (recordsQuery.Any())
                 {
-                    Name = name,
-                    Surname = surname,
-                    Email = email,
-                    GroupID = groupID
-                };
+                    Student s = new Student
+                    {
+                        Name = name,
+                        Surname = surname,
+                        Email = email,
+                        GroupID = groupID
+                    };
 
-                db.Student.Add(s);
-                db.SaveChanges();
+                    db.Student.Add(s);
+                    db.SaveChanges();
 
-                return true;
+                    return true;
+                }
             }
+            catch{}
 
             return false;
         }
@@ -198,7 +202,7 @@ namespace Data
                 db.Teacher.Add(t);
                 db.SaveChanges();
 
-                return false;
+                return true;
             }
             catch
             {
@@ -218,6 +222,23 @@ namespace Data
             return recordsQuery.SingleOrDefault();
         }
 
+        public bool VerifyGroup(int groupID)
+        {
+            var records = db.Group;
+
+            var recordsQuery =
+                from record in records
+                where record.GroupID == groupID
+                select record;
+
+            if (recordsQuery.Any())
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public double GetAttendances(int groupID, int studentID)
         {
             var records = db.StudentAttendance;
@@ -227,14 +248,14 @@ namespace Data
                 where record.Lesson.GroupID == groupID && record.StudentID == studentID
                 select record;
 
-            List<StudentAttendance> allAttendences = new List<StudentAttendance>();
+            List<StudentAttendance> allAttendances = new List<StudentAttendance>();
 
             foreach (var studentAttendance in recordsQuery)
             {
-                allAttendences.Add(studentAttendance);
+                allAttendances.Add(studentAttendance);
             }
 
-            return allAttendences.Count;
+            return allAttendances.Count;
         }
 
         public double GetSpecificAttendances(int studentID)

@@ -13,28 +13,28 @@ namespace OOP_Assignment1_Presentation
         static BL bl = new BL();
         static void Main(string[] args)
         {
-            int userchoice = 0;
+            int userChoice = 0;
             string username = string.Empty;
             List<string> menuOptions = new List<string>();
             menuOptions.AddRange(new List<string> { "Login", "Exit" });
 
-            while (userchoice != 2)
+            while (userChoice != 2)
             {
                 do
                 {
                     MenuMaker("Main Menu", menuOptions);
 
                     Console.Write("Enter Choice: ");
-                    int.TryParse(Console.ReadLine(), out userchoice);
+                    int.TryParse(Console.ReadLine(), out userChoice);
 
-                    if (userchoice == 0)
+                    if (userChoice == 0)
                     {
                         DisplayError();
                     }
 
-                } while (userchoice == 0);
+                } while (userChoice == 0);
 
-                if (userchoice == 1)
+                if (userChoice == 1)
                 {
                     Console.Clear();
                     Console.WriteLine("Login\n=====\n");
@@ -48,11 +48,11 @@ namespace OOP_Assignment1_Presentation
                         string password = Console.ReadLine();
                         if (bl.Login(username, password))
                         {
-                            //Show teachers Menu
-                            while (true)
-                            {
-                                int optionChosen = 0;
+                            int optionChosen = 0;
 
+                            //Show teachers Menu
+                            while (optionChosen != 8)
+                            {
                                 do
                                 {
                                     MenuMaker("Teachers Menu", new List<string>
@@ -60,7 +60,7 @@ namespace OOP_Assignment1_Presentation
                                         ,"Add a New Student","Add a New Teacher"
                                         ,"Check a student's attendance percentage"
                                         ,"Get all attendances submitted on a particular day"
-                                        ,"Edit Student"});
+                                        ,"Edit Student","Log out"});
 
                                     Console.Write("\nEnter Choice: ");
                                     int.TryParse(Console.ReadLine(), out optionChosen);
@@ -74,6 +74,7 @@ namespace OOP_Assignment1_Presentation
 
                                 switch (optionChosen)
                                 {
+                                    //Add new attendance
                                     case 1:
 
                                     Console.Clear();
@@ -95,63 +96,63 @@ namespace OOP_Assignment1_Presentation
                                         }
 
                                         Console.Write("\nPlease input your selected Group ID: ");
-                                        try
-                                        {
-                                            selectedGroupID = Convert.ToInt32(Console.ReadLine());
-                                        }
-                                        catch
+
+                                        int.TryParse(Console.ReadLine(), out selectedGroupID);
+
+                                        if (selectedGroupID == 0)
                                         {
                                             DisplayError();
                                         }
 
-                                        Console.WriteLine(bl.AddLesson(selectedGroupID, DateTime.Now));
-
-                                        Console.WriteLine("\nPress Any Key To Continue");
-                                        Console.ReadKey();
-
-                                        Console.Clear();
-
-                                        List<string> studentsInClass = bl.AllStudentsInGroup(selectedGroupID);
-
-                                        MenuMaker("New Attendance",new List<string>());
-                                        Console.WriteLine("\nGroup ID: " + selectedGroupID);
-                                        Console.WriteLine("Student ID\t\tStudent Name\t\tStudent Surname\t\tPresence(P/A)");
-                                        Console.WriteLine("==========\t\t============\t\t===============\t\t=============");
-                                        foreach (var student in studentsInClass)
-                                        {
-                                            Console.WriteLine(student);
-                                        }
-
-                                        int startingCursorPosition = 6;
-
-                                        for (int i = 0; i < studentsInClass.Count; i++)
-                                        {
-                                            Console.SetCursorPosition(72, startingCursorPosition);
-                                            char status = Console.ReadKey().KeyChar;
-
-                                            switch (status)
-                                            {
-                                                    case 'p':
-                                                        startingCursorPosition++;
-                                                        studentsInClass[i] = studentsInClass[i] + "p";
-                                                        break;
-                                                    case 'a':
-                                                        startingCursorPosition++;
-                                                        studentsInClass[i] = studentsInClass[i] + "a";
-                                                        break;
-                                                    default:
-                                                        Console.Write("\b \b");
-                                                        i--;
-                                                        break;
-                                            }
-                                        }
-
-                                        bl.AddAttendance(studentsInClass);
                                     }
 
+                                    Console.WriteLine(bl.AddLesson(selectedGroupID, DateTime.Now));
+
+                                    Console.WriteLine("\nPress Any Key To Continue");
+                                    Console.ReadKey();
+
+                                    Console.Clear();
+
+                                    List<string> studentsInClass = bl.AllStudentsInGroup(selectedGroupID);
+
+                                    MenuMaker("New Attendance",new List<string>());
+                                    Console.WriteLine("\nGroup ID: " + selectedGroupID);
+                                    Console.WriteLine("Student ID\t\tStudent Name\t\tStudent Surname\t\tPresence(P/A)");
+                                    Console.WriteLine("==========\t\t============\t\t===============\t\t=============");
+                                    foreach (var student in studentsInClass)
+                                    {
+                                        Console.WriteLine(student);
+                                    }
+
+                                    int startingCursorPosition = 6;
+
+                                    for (int i = 0; i < studentsInClass.Count; i++)
+                                    {
+                                        Console.SetCursorPosition(72, startingCursorPosition);
+                                        char status = Console.ReadKey().KeyChar;
+
+                                        switch (status)
+                                        {
+                                                case 'p':
+                                                    startingCursorPosition++;
+                                                    studentsInClass[i] = studentsInClass[i] + "p";
+                                                    break;
+                                                case 'a':
+                                                    startingCursorPosition++;
+                                                    studentsInClass[i] = studentsInClass[i] + "a";
+                                                    break;
+                                                default:
+                                                    Console.Write("\b \b");
+                                                    i--;
+                                                    break;
+                                        }
+                                    }
+
+                                    bl.AddAttendance(studentsInClass);
                                     break;
 
                                     case 2:
+                                        //add new group
                                         Console.Clear();
 
                                         Console.Write("Please input group name: ");
@@ -175,11 +176,11 @@ namespace OOP_Assignment1_Presentation
 
                                         break;
                                     case 3:
-                                        //To be tested
+                                        //add new student
                                         Console.Clear();
 
                                         Console.Write("Please input group ID: ");
-                                        int chosenGroupID = Convert.ToInt32(Console.ReadLine());
+                                        int.TryParse(Console.ReadLine(), out int chosenGroupID);
 
                                         Console.Write("Please input student name: ");
                                         string studentName = Console.ReadLine();
@@ -196,15 +197,18 @@ namespace OOP_Assignment1_Presentation
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Failed to add student");
+                                            Console.WriteLine("Failed to add student, please be sure that you inputted an existing groupID and filled all fields");
                                         }
+
+                                        Console.WriteLine("\nPress any key to continue...");
+                                        Console.ReadKey();
 
                                         break;
                                     case 4:
-                                        //To be tested
+                                        //add new teacher
                                         Console.Clear();
                                         
-                                        Console.Write("\n Please input new teacher username: ");
+                                        Console.Write("Please input new teacher username: ");
                                         string teacherUsername = Console.ReadLine();
 
                                         Console.Write("\nPlease input new teacher password: ");
@@ -227,42 +231,48 @@ namespace OOP_Assignment1_Presentation
                                         }
                                         else
                                         {
-                                            DisplayError();
+                                            Console.WriteLine("\nFailed to add teacher. Please be sure there is " +
+                                                              "not an already existing teacher with that username " +
+                                                              "and that all fields are filled.");
+                                            Console.ReadKey();
                                         }
 
                                         break;
                                     case 5:
+                                        //check attendance percentage
                                         Console.Clear();
 
                                         Console.Write("Please input student ID: ");
 
-                                        try
-                                        {
-                                            int proposedStudentID = Convert.ToInt32(Console.ReadLine());
+                                        int.TryParse(Console.ReadLine(), out int proposedStudentID);
+
+                                        if(proposedStudentID != 0){
+
                                             if (bl.VerifyStudentID(proposedStudentID))
                                             {
                                                 Console.Clear();
 
-                                                double Percentage = bl.ReturnAttendancePercentage(proposedStudentID);
+                                                double percentage = bl.ReturnAttendancePercentage(proposedStudentID);
 
-                                                Console.WriteLine("Your Attendance percentage is: " + Percentage + "%");
+                                                Console.WriteLine("Your Attendance percentage is: " + percentage + "%");
 
                                                 Console.WriteLine("\nPress any key to continue...");
-                                                Console.ReadKey();
                                             }
                                             else
                                             {
                                                 Console.WriteLine("\nNo Student with that ID found.");
                                             }
+
+                                            Console.ReadKey();
                                         }
-                                        catch
+                                        else
                                         {
                                             DisplayError();
                                         }
 
                                         break;
                                     case 6:
-
+                                        //check attendances on a particular day
                                         MenuMaker("Submitted Attendances",new List<string>());
 
                                         Console.Write("\nDay: ");
@@ -270,20 +280,20 @@ namespace OOP_Assignment1_Presentation
                                         Console.Write("\nYear: ");
 
                                         Console.SetCursorPosition(5,3);
-                                        int day = Convert.ToInt32(Console.ReadLine());
+                                        int.TryParse(Console.ReadLine(), out int day);
                                         Console.SetCursorPosition(7, 4);
-                                        int month = Convert.ToInt32(Console.ReadLine());
+                                        int.TryParse(Console.ReadLine(), out int month);
                                         Console.SetCursorPosition(6, 5);
-                                        int year = Convert.ToInt32(Console.ReadLine());
+                                        int.TryParse(Console.ReadLine(), out int year);
 
-                                        Console.WriteLine("\nNumber of attendances submitted on given day: " + bl.ReturnAttendancesOnDay(day,month,year));
+                                        Console.WriteLine(bl.ReturnAttendancesOnDay(day, month, year));
 
                                         Console.WriteLine("\nPress any key to continue...");
                                         Console.ReadKey();
 
                                         break;
                                     case 7:
-
+                                        //edit student
                                         int studentID = 0;
 
                                         do
@@ -341,9 +351,11 @@ namespace OOP_Assignment1_Presentation
                             }
 
                         }
-
-                        Console.WriteLine("Password Incorrect.");
-                        Console.ReadKey();
+                        else
+                        {
+                            Console.WriteLine("Password Incorrect.");
+                            Console.ReadKey();
+                        }
                     }
                     else
                     {

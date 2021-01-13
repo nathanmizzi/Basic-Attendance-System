@@ -10,9 +10,9 @@ namespace Business
 {
     public class BL
     {
-        public int loggedInID;
-        public int lastLessonID;
-        public int studentGroup;
+        private int loggedInID;
+        private int lastLessonID;
+        private int studentGroup;
         static DL dl = new DL();
         public bool ValidateMatches(string username)
         {
@@ -93,17 +93,28 @@ namespace Business
 
         public bool AddStudent(int groupID,string name,string surname, string email)
         {
-            bool groupFound = dl.NewStudent(groupID,name,surname,email);
+            if (dl.VerifyGroup(groupID) && !string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(surname) && !string.IsNullOrEmpty(email))
+            {
+                bool groupFound = dl.NewStudent(groupID, name, surname, email);
 
-            return groupFound;
+                return groupFound;
+            }
+
+            return false;
         }
 
         public bool AddTeacher(string username,string password,string name,string surname,string email)
         {
-            if (!String.IsNullOrEmpty(username) || !String.IsNullOrEmpty(password) || !String.IsNullOrEmpty(name) ||
-                !String.IsNullOrEmpty(surname) || !String.IsNullOrEmpty(email))
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(name) &&
+                !string.IsNullOrEmpty(surname) && !string.IsNullOrEmpty(email))
             {
-                dl.NewTeacher(username,password,name,surname,email);
+                if (dl.CheckUsername(username) == null)
+                {
+                    if (dl.NewTeacher(username, password, name, surname, email))
+                    {
+                        return true;
+                    }
+                }
             }
 
             return false;
@@ -111,16 +122,12 @@ namespace Business
 
         public bool VerifyStudentID(int proposedID)
         {
-            if (proposedID != null)
+            Student s = dl.VerifyStudent(proposedID);
+
+            if (s != null)
             {
-
-                Student s = dl.VerifyStudent(proposedID);
-
-                if (s != null)
-                {
-                    studentGroup = s.GroupID;
-                    return true;
-                }
+                studentGroup = s.GroupID;
+                return true;
             }
 
             return false;
@@ -130,23 +137,24 @@ namespace Business
         {
             double allAttendances = dl.GetAttendances(studentGroup,studentID);
 
-            double matchingAttendences = dl.GetSpecificAttendances(studentID);
+            double matchingAttendances = dl.GetSpecificAttendances(studentID);
 
-            double attendancePercentage = (matchingAttendences / allAttendances) * 100;
+            double attendancePercentage = (matchingAttendances / allAttendances) * 100;
             
             return attendancePercentage;
         }
 
-        public int ReturnAttendancesOnDay(int day, int month, int year)
+        public string ReturnAttendancesOnDay(int day, int month, int year)
         {
             if (day >= 1 && day <= 31 && month >= 1 && month <= 12)
             {
                 int attendanceCount = dl.GetAttendancesOnDay(loggedInID,day, month, year);
 
-                return attendanceCount;
+                return "\nNumber of attendances submitted on given day: " +
+                       attendanceCount;
             }
 
-            return 0;
+            return "\nInvalid Date";
         }
 
         public bool AttemptEditStudent(int studentID, string name, string surname, string email)
